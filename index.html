@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Board — Campus Lost &amp; Found</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Caveat:wght@600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ================= LOGIN SCREEN ================= -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <span class="pin-mark">📌</span>
+    <h1>The Board</h1>
+    <p class="tagline">campus lost &amp; found — pinned in one place</p>
+    <button id="googleLoginBtn" class="btn btn-primary btn-full">
+      Sign in with Google
+    </button>
+    <p id="loginError" class="login-error" hidden></p>
+  </div>
+</div>
+
+<!-- ================= MAIN APP ================= -->
+<div id="appRoot" class="board" hidden>
+
+  <header class="board-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="pin-mark">📌</span>
+        <div>
+          <h1>The Board</h1>
+          <p class="tagline">campus lost &amp; found — pinned in one place</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <button id="reportBtn" class="btn btn-primary">+ Report an item</button>
+        <div class="user-chip">
+          <img id="userAvatar" class="avatar" src="" alt="">
+          <span id="userName"></span>
+          <button id="signOutBtn" class="btn-icon" title="Sign out">⎋</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="controls">
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-filter="all">All</button>
+      <button class="tab" data-filter="lost">Lost</button>
+      <button class="tab" data-filter="found">Found</button>
+      <button class="tab" data-filter="mine">My posts</button>
+    </div>
+
+    <div class="filters">
+      <input type="text" id="searchInput" placeholder="Search item, place, keyword…">
+      <select id="categoryFilter">
+        <option value="all">All categories</option>
+        <option value="ID/Card">ID / Card</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Bottle/Bag">Bottle / Bag</option>
+        <option value="Books/Notes">Books / Notes</option>
+        <option value="Accessory">Accessory</option>
+        <option value="Other">Other</option>
+      </select>
+      <label class="resolved-toggle">
+        <input type="checkbox" id="showResolved">
+        show resolved
+      </label>
+    </div>
+  </section>
+
+  <main id="itemsGrid" class="items-grid"></main>
+  <p id="emptyState" class="empty-state" hidden></p>
+  <p id="loadingState" class="empty-state">Loading the board…</p>
+
+</div>
+
+<!-- ================= REPORT FORM ================= -->
+<div id="overlay" class="overlay"></div>
+
+<aside id="formPanel" class="form-panel" aria-hidden="true">
+  <div class="form-header">
+    <h2>Pin a new item</h2>
+    <button id="closeForm" class="btn-icon" aria-label="Close form">✕</button>
+  </div>
+
+  <form id="itemForm">
+    <div class="type-switch">
+      <label class="type-option">
+        <input type="radio" name="type" value="lost" checked>
+        <span>I lost something</span>
+      </label>
+      <label class="type-option">
+        <input type="radio" name="type" value="found">
+        <span>I found something</span>
+      </label>
+    </div>
+
+    <label class="field">
+      <span>Item name</span>
+      <input type="text" id="itemTitle" required placeholder="e.g. Blue water bottle">
+    </label>
+
+    <label class="field">
+      <span>Category</span>
+      <select id="itemCategory" required>
+        <option value="ID/Card">ID / Card</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Bottle/Bag">Bottle / Bag</option>
+        <option value="Books/Notes">Books / Notes</option>
+        <option value="Accessory">Accessory</option>
+        <option value="Other">Other</option>
+      </select>
+    </label>
+
+    <!-- live matches against the opposite post type -->
+    <div id="matchPanel" class="match-panel" hidden>
+      <p class="match-heading" id="matchHeading">Check these first — could be your item:</p>
+      <div id="matchList" class="match-list"></div>
+    </div>
+
+    <label class="field">
+      <span>Description</span>
+      <textarea id="itemDesc" rows="3" placeholder="Color, brand, distinguishing marks…"></textarea>
+    </label>
+
+    <label class="field">
+      <span>Location</span>
+      <input type="text" id="itemLocation" required placeholder="e.g. Library, 2nd floor">
+    </label>
+
+    <label class="field">
+      <span>Date</span>
+      <input type="date" id="itemDate" required>
+    </label>
+
+    <label class="field">
+      <span>Photo (optional)</span>
+      <input type="file" id="itemPhoto" accept="image/*">
+      <img id="photoPreview" class="photo-preview" hidden>
+    </label>
+
+    <label class="field">
+      <span>Verification question</span>
+      <input type="text" id="itemQuestion" required placeholder="e.g. What sticker is on the back?">
+      <small class="field-hint">Whoever claims this item must answer it correctly. Only you should know the answer.</small>
+    </label>
+
+    <button type="submit" class="btn btn-primary btn-full" id="submitBtn">Pin it to the board</button>
+  </form>
+</aside>
+
+<!-- ================= CLAIM MODAL ================= -->
+<div id="claimOverlay" class="overlay"></div>
+<div id="claimModal" class="claim-modal" aria-hidden="true">
+  <div class="form-header">
+    <h2>Claim this item</h2>
+    <button id="closeClaim" class="btn-icon" aria-label="Close">✕</button>
+  </div>
+  <p id="claimItemTitle" class="claim-item-title"></p>
+  <p id="claimQuestionText" class="claim-question"></p>
+  <label class="field">
+    <span>Your answer</span>
+    <textarea id="claimAnswer" rows="3" required placeholder="Answer the question above…"></textarea>
+  </label>
+  <button id="submitClaimBtn" class="btn btn-primary btn-full">Submit claim</button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- Firebase (compat SDK — works with plain <script> tags, no build tools) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+
+<script src="firebase-config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
