@@ -1,6 +1,4 @@
-// ============================================================
 // Firebase init
-// ============================================================
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
@@ -18,9 +16,7 @@ let activeCategory = "all";
 let searchTerm = "";
 let showResolved = false;
 
-// ============================================================
 // Elements
-// ============================================================
 const loginScreen = document.getElementById("loginScreen");
 const appRoot = document.getElementById("appRoot");
 const googleLoginBtn = document.getElementById("googleLoginBtn");
@@ -59,9 +55,7 @@ const claimQuestionText = document.getElementById("claimQuestionText");
 const claimAnswer = document.getElementById("claimAnswer");
 const submitClaimBtn = document.getElementById("submitClaimBtn");
 
-// ============================================================
 // Auth
-// ============================================================
 googleLoginBtn.addEventListener("click", () => {
   loginError.hidden = true;
   const provider = new firebase.auth.GoogleAuthProvider();
@@ -117,9 +111,7 @@ auth.onAuthStateChanged(async (user) => {
   listenToPosts();
 });
 
-// ============================================================
 // Firestore: live posts listener
-// ============================================================
 function listenToPosts() {
   if (unsubscribePosts) unsubscribePosts();
   loadingState.hidden = false;
@@ -135,9 +127,7 @@ function listenToPosts() {
     });
 }
 
-// ============================================================
 // Helpers
-// ============================================================
 function formatDate(dateStr) {
   if (!dateStr) return "";
   const d = new Date(dateStr + "T00:00:00");
@@ -164,9 +154,7 @@ function keywordsOverlap(a, b) {
   return wordsB.some(w => wordsA.has(w));
 }
 
-// ============================================================
 // Rendering: board
-// ============================================================
 function getFilteredPosts() {
   return posts
     .filter(p => {
@@ -249,9 +237,7 @@ function render() {
   });
 }
 
-// ============================================================
-// Claims: owner side (list + accept/reject)
-// ============================================================
+// Claim
 function loadClaimsForPost(post, container) {
   db.collection("posts").doc(post.id).collection("claims")
     .where("status", "==", "pending")
@@ -328,9 +314,7 @@ itemsGrid.addEventListener("click", async (e) => {
   }
 });
 
-// ============================================================
-// Claim modal: claimant side
-// ============================================================
+// Claim modal
 function openClaimModal(post) {
   activeClaimPostId = post.id;
   claimItemTitle.textContent = post.title;
@@ -375,9 +359,7 @@ submitClaimBtn.addEventListener("click", async () => {
   submitClaimBtn.disabled = false;
 });
 
-// ============================================================
-// Tabs & filters
-// ============================================================
+// Tabs & filter
 tabs.forEach(tab => {
   tab.addEventListener("click", () => {
     tabs.forEach(t => t.classList.remove("active"));
@@ -402,9 +384,7 @@ showResolvedCheckbox.addEventListener("change", (e) => {
   render();
 });
 
-// ============================================================
 // Report form: open/close
-// ============================================================
 function openForm() {
   formPanel.classList.add("open");
   overlay.classList.add("open");
@@ -486,9 +466,7 @@ document.getElementById("itemTitle").addEventListener("input", updateMatchPanel)
 document.getElementById("itemCategory").addEventListener("change", updateMatchPanel);
 itemForm.querySelectorAll('input[name="type"]').forEach(r => r.addEventListener("change", updateMatchPanel));
 
-// ============================================================
 // Report form: submit
-// ============================================================
 itemForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
